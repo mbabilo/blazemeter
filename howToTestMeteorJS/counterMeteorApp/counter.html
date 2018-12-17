@@ -1,0 +1,17 @@
+<head>
+  <title>Counter</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+</head>
+
+<body>
+  <div class="outer">
+    <h1 class="title">Counter</h1>
+    {{> counter}}
+  </div>
+</body>
+
+<template name="counter">
+  <button class="increment">Click</button>
+  {{counter}}
+</template>
+
