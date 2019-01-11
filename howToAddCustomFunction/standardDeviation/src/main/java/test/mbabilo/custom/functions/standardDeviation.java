@@ -17,11 +17,13 @@ public class standardDeviation extends AbstractFunction {
     private static final String MyFunctionName = "__standardDeviation-Sample";
     private static final String SEPARATOR = "\\|";
 
-    private static final List < String > desc = new LinkedList < String > ();
+    private static final List<String> desc = new LinkedList<String>();
+
     static {
         desc.add("Array of numbers separated by \"|\", fractional numbers through point.");
         desc.add("Name of variable in which to store the result (optional)");
     }
+
     private Object[] temp;
 
     public String execute(SampleResult arg0, Sampler arg1) throws InvalidVariableException {
@@ -29,13 +31,17 @@ public class standardDeviation extends AbstractFunction {
         JMeterVariables vars = getVariables();
 
         final String originalString = ((CompoundVariable) temp[0]).execute().trim();
-
-        String[] numbers = originalString.split(SEPARATOR);
-        double[] input = new double[numbers.length];
-        for (int i = 0; i < numbers.length; i++) {
-            input[i] = Double.valueOf(numbers[i]);
+        double[] input = new double[0];
+        try {
+            String[] numbers = originalString.split(SEPARATOR);
+            input = new double[numbers.length];
+            for (int i = 0; i < numbers.length; i++) {
+                input[i] = Double.valueOf(numbers[i]);
+            }
+        } catch (Exception e) {
         }
-        double dv = populationStandardDeviation(input);
+
+        double dv = sampleStandardDeviation(input);
 
 //user might want the result in a variable
         if (null != vars) {
@@ -45,13 +51,16 @@ public class standardDeviation extends AbstractFunction {
         return String.valueOf(dv);
     }
 
-    private strictfp double populationStandardDeviation(double[] temp) {
+    private strictfp double sampleStandardDeviation(double[] temp) {
         double mean = mean(temp);
         double n = temp.length;
         double dv = 0;
         for (double d : temp) {
             double dm = d - mean;
             dv += dm * dm;
+        }
+        if (n < 2) {
+            return 0;
         }
         return Math.sqrt(dv / (n - 1));
     }
@@ -63,8 +72,7 @@ public class standardDeviation extends AbstractFunction {
     private strictfp double sum(double[] temp) {
         if (temp == null || temp.length == 0) {
             throw new IllegalArgumentException("The data array either is null or does not contain any data.");
-        }
-        else {
+        } else {
             double sum = 0;
             for (double var : temp) {
                 sum += var;
@@ -73,7 +81,7 @@ public class standardDeviation extends AbstractFunction {
         }
     }
 
-    public void setParameters(Collection < CompoundVariable > parameters) throws InvalidVariableException {
+    public void setParameters(Collection<CompoundVariable> parameters) throws InvalidVariableException {
         temp = parameters.toArray();
     }
 
