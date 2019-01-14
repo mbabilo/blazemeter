@@ -7,22 +7,19 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterVariables;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
-public class standardDeviation extends AbstractFunction {
+public class StandardDeviation extends AbstractFunction {
 
 
-    private static final String MyFunctionName = "__standardDeviation-Sample";
-    private static final String SEPARATOR = "\\|";
+    private static final String MY_FUNCTION_NAME = "__standardDeviation-Sample";
+    private static final String SEPARATOR1 = "\\|";
+    private static final String SEPARATOR2 = ",";
 
-    private static final List<String> desc = new LinkedList<String>();
+    private static final List<String> DESC = Arrays.asList("Array of numbers separated by \"|\", fractional numbers through point.", "Name of variable in which to store the result (optional)");
 
-    static {
-        desc.add("Array of numbers separated by \"|\", fractional numbers through point.");
-        desc.add("Name of variable in which to store the result (optional)");
-    }
 
     private Object[] temp;
 
@@ -33,7 +30,8 @@ public class standardDeviation extends AbstractFunction {
         final String originalString = ((CompoundVariable) temp[0]).execute().trim();
         double[] input = new double[0];
         try {
-            String[] numbers = originalString.split(SEPARATOR);
+
+            String[] numbers = split(originalString);
             input = new double[numbers.length];
             for (int i = 0; i < numbers.length; i++) {
                 input[i] = Double.valueOf(numbers[i]);
@@ -49,6 +47,14 @@ public class standardDeviation extends AbstractFunction {
             vars.put(resultVariable, String.valueOf(dv)); //store the result in the user defined variable
         }
         return String.valueOf(dv);
+    }
+
+    private String[] split(String originalString) {
+        String[] res = originalString.split(SEPARATOR1);
+        if (res.length < 2) {
+            res = originalString.split(SEPARATOR2);
+        }
+        return res;
     }
 
     private strictfp double sampleStandardDeviation(double[] temp) {
@@ -86,10 +92,10 @@ public class standardDeviation extends AbstractFunction {
     }
 
     public String getReferenceKey() {
-        return MyFunctionName;
+        return MY_FUNCTION_NAME;
     }
 
     public List<String> getArgumentDesc() {
-        return desc;
+        return DESC;
     }
 }
